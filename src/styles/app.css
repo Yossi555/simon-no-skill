@@ -142,6 +142,15 @@ h2 { font-size: 24px; font-weight: 700; }
   cursor: pointer;
 }
 .btn--primary { background: var(--blue); box-shadow: 0 6px 16px rgba(0, 163, 255, 0.35); }
+.btn--secondary { background: transparent; border: 1px solid var(--border); color: var(--soft-gray); }
+.btn--danger { background: var(--red); }
+
+.overlay--fixed { position: fixed; z-index: 10; border-radius: 0; padding: var(--s3); }
+.dialog--light { width: min(100%, 320px); background: var(--white); color: var(--bg); border: 0; }
+.dialog--light p { font-size: 16px; color: #3a4a63; }
+.dialog--light .btn--secondary { border-color: #c5ccd8; color: var(--bg); }
+.dialog__actions { display: flex; gap: var(--s2); }
+.dialog__error { font-size: 14px; color: var(--red); }
 
 .card {
   background: var(--surface);
@@ -156,6 +165,15 @@ h2 { font-size: 24px; font-weight: 700; }
 .about { gap: var(--s3); }
 .about__rules { padding-inline-start: var(--s4); display: flex; flex-direction: column; gap: var(--s1); }
 .about__history-title { font-size: 20px; font-weight: 600; margin-top: var(--s1); }
+.about__error { font-size: 14px; color: var(--red); text-align: center; }
+
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.history-card { flex-direction: row; align-items: center; justify-content: space-between; gap: var(--s2); }
+.history-card__main { display: flex; flex-direction: column; gap: 4px; font-size: 16px; }
+.history-card__outcome { font-weight: 600; }
+.history-card__outcome--win { color: var(--green); }
+.history-card__outcome--loss { color: var(--soft-gray); }
+.history-card__date { font-size: 14px; color: var(--soft-gray); white-space: nowrap; }
 
 .navbar {
   display: flex;

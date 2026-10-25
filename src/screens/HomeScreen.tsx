@@ -2,9 +2,9 @@ import { Board } from '../components/Board';
 import { ResultDialog } from '../components/ResultDialog';
 import type { useGame } from '../game/useGame';
 
-type Props = { game: ReturnType<typeof useGame> };
+type Props = { game: ReturnType<typeof useGame>; saveError: boolean };
 
-export function HomeScreen({ game }: Props) {
+export function HomeScreen({ game, saveError }: Props) {
   const { state, litColor, audioError, start, resume, press, pressAndRelease, dismiss } = game;
   const { status } = state;
 
@@ -26,6 +26,7 @@ export function HomeScreen({ game }: Props) {
           <ResultDialog
             won={status === 'won'}
             completedRounds={state.completedRounds}
+            saveError={saveError}
             onConfirm={dismiss}
           />
         )}
