@@ -51,7 +51,34 @@ h2 { font-size: 24px; font-weight: 700; }
 .home { align-items: center; justify-content: space-between; }
 .home .screen__header { align-self: stretch; }
 .home__round { font-size: 20px; font-weight: 600; text-align: center; }
-.home__actions { width: 100%; min-height: 56px; }
+.home__stage { position: relative; width: 100%; display: flex; justify-content: center; }
+.home__actions { width: 100%; min-height: 72px; display: flex; flex-direction: column; gap: var(--s1); text-align: center; }
+.home__status { font-size: 20px; font-weight: 600; }
+.home__hint { font-size: 14px; color: var(--soft-gray); }
+.home__error { font-size: 14px; color: var(--red); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 22, 40, 0.8);
+  border-radius: 24px;
+}
+.dialog {
+  width: min(100%, 280px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: var(--s4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
 
 .board {
   direction: ltr;
@@ -78,7 +105,16 @@ h2 { font-size: 24px; font-weight: 700; }
 .quadrant--red { background: var(--red); border-top-right-radius: 100%; }
 .quadrant--yellow { background: var(--yellow); border-bottom-left-radius: 100%; }
 .quadrant--blue { background: var(--blue); border-bottom-right-radius: 100%; }
-.quadrant:active { filter: brightness(1.15); }
+.quadrant { user-select: none; -webkit-touch-callout: none; transition: filter 80ms, opacity 80ms, box-shadow 80ms; }
+.quadrant:not(:disabled):active { filter: brightness(1.15); }
+.quadrant:disabled { cursor: default; }
+.quadrant--dim { opacity: 0.3; }
+.quadrant--lit { filter: brightness(1.3); box-shadow: inset 0 0 28px 6px rgba(255, 255, 255, 0.55); }
+.quadrant--green { color: var(--green); }
+.quadrant--red { color: var(--red); }
+.quadrant--yellow { color: var(--yellow); }
+.quadrant--blue { color: var(--blue); }
+@media (prefers-reduced-motion: reduce) { .quadrant { transition: none; } }
 
 .board__center {
   position: absolute;
@@ -90,6 +126,7 @@ h2 { font-size: 24px; font-weight: 700; }
   border: 4px solid var(--border);
   border-radius: 50%;
   pointer-events: none;
+  z-index: 2;
 }
 
 .btn {

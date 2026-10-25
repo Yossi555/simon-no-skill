@@ -1,17 +1,54 @@
 import { Board } from '../components/Board';
+import { ResultDialog } from '../components/ResultDialog';
+import type { useGame } from '../game/useGame';
 
-export function HomeScreen() {
+type Props = { game: ReturnType<typeof useGame> };
+
+export function HomeScreen({ game }: Props) {
+  const { state, litColor, audioError, start, press, pressAndRelease, dismiss } = game;
+  const { status } = state;
+
   return (
     <section className="screen home">
       <header className="screen__header">
         <h1>דיסקו גו</h1>
       </header>
-      <h2 className="home__round">שלב 1 מתוך 10</h2>
-      <Board />
+      <h2 className="home__round">שלב {state.round} מתוך 10</h2>
+      <div className="home__stage">
+        <Board
+          litColor={litColor}
+          disabled={status !== 'awaitingInput'}
+          onPress={press}
+          onKeyPress={pressAndRelease}
+        />
+        {state.resultShown && (
+          <ResultDialog
+            won={status === 'won'}
+            completedRounds={state.completedRounds}
+            onConfirm={dismiss}
+          />
+        )}
+      </div>
       <div className="home__actions">
-        <button type="button" className="btn btn--primary">
-          התחל משחק
-        </button>
+        {status === 'presenting' && <p className="home__status">המשחק מציג את הרצף</p>}
+        {status === 'awaitingInput' && (
+          <>
+            <p className="home__status">התור שלך</p>
+            <p className="home__hint">הקש על הצבעים לפי הסדר</p>
+          </>
+        )}
+        {status === 'idle' && (
+          <>
+            {audioError && (
+              <p className="home__error" role="alert">
+                לא ניתן להפעיל את הצליל. נסו שוב.
+              </p>
+            )}
+            <button type="button" className="btn btn--primary" onClick={() => void start()}>
+              התחל משחק
+            </button>
+          </>
+        )}
       </div>
     </section>
   );
