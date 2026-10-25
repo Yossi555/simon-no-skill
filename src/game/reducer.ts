@@ -86,11 +86,23 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if ((state.status !== 'won' && state.status !== 'lost') || !state.resultShown) return state;
       return { ...initialGameState, gameId: state.gameId, presentationId: state.presentationId };
 
-    case 'abandon':
-      if (state.status === 'idle' || state.resultShown) return state;
+    case 'pause':
+      if (state.status !== 'presenting' && state.status !== 'awaitingInput') return state;
       return {
-        ...initialGameState,
-        gameId: state.gameId,
+        ...state,
+        status: 'paused',
+        // במעבר בין שלבים הצבע החדש כבר נוסף – ההשהיה משלימה את המעבר לשלב הבא
+        round: isRoundPending(state) ? state.round + 1 : state.round,
+        inputIndex: 0,
+        presentationId: state.presentationId + 1,
+      };
+
+    case 'resume':
+      if (state.status !== 'paused') return state;
+      return {
+        ...state,
+        status: 'presenting',
+        inputIndex: 0,
         presentationId: state.presentationId + 1,
       };
   }

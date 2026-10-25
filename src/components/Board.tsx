@@ -3,13 +3,14 @@ import { COLORS, type GameColor } from '../game/colors';
 type Props = {
   litColor: GameColor | null;
   disabled: boolean;
+  paused?: boolean;
   onPress: (color: GameColor) => void;
   onKeyPress: (color: GameColor) => void;
 };
 
-export function Board({ litColor, disabled, onPress, onKeyPress }: Props) {
+export function Board({ litColor, disabled, paused = false, onPress, onKeyPress }: Props) {
   return (
-    <div className="board">
+    <div className={paused ? 'board board--paused' : 'board'}>
       {COLORS.map((c) => {
         const state = litColor === null ? '' : litColor === c.id ? ' quadrant--lit' : ' quadrant--dim';
         return (

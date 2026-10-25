@@ -95,7 +95,6 @@ describe('gameReducer', () => {
     expect(gameReducer(s, { type: 'presentationDone', presentationId: 99 })).toBe(s);
     expect(gameReducer(s, { type: 'start', firstColor: 'red' })).toBe(s);
     expect(gameReducer(s, { type: 'dismiss' })).toBe(s);
-    expect(gameReducer(initialGameState, { type: 'abandon' })).toBe(initialGameState);
     const lost = gameReducer(atRound(1, SEQ), { type: 'press', color: 'red', nextColor: 'red' });
     expect(gameReducer(lost, { type: 'revealResult', gameId: 99 })).toBe(lost);
     expect(gameReducer(lost, { type: 'dismiss' })).toBe(lost); // טרם הוצגה
@@ -110,12 +109,66 @@ describe('gameReducer', () => {
     expect(next.sequence).toEqual(['blue']);
   });
 
-  it('abandon מחזיר ל-idle ומבטל הצגה', () => {
+  it('pause בזמן הצגה – paused, מזהה חדש, הצגה מיושנת מתעלמת', () => {
     const s = started();
-    const a = gameReducer(s, { type: 'abandon' });
-    expect(a.status).toBe('idle');
-    expect(a.presentationId).toBe(s.presentationId + 1);
-    expect(gameReducer(a, { type: 'presentationDone', presentationId: s.presentationId })).toBe(a);
+    const p = gameReducer(s, { type: 'pause' });
+    expect(p).toMatchObject({ status: 'paused', sequence: ['green'], round: 1, inputIndex: 0 });
+    expect(p.presentationId).toBe(s.presentationId + 1);
+    expect(gameReducer(p, { type: 'presentationDone', presentationId: s.presentationId })).toBe(p);
+  });
+
+  it('pause באמצע קלט זורק קלט חלקי; resume מציג אותו רצף ושלב', () => {
+    let s = atRound(3, SEQ);
+    s = run(
+      [
+        { type: 'press', color: 'green', nextColor: 'red' },
+        { type: 'press', color: 'red', nextColor: 'red' },
+      ],
+      s,
+    );
+    expect(s.inputIndex).toBe(2);
+    const p = gameReducer(s, { type: 'pause' });
+    expect(p).toMatchObject({ status: 'paused', inputIndex: 0, round: 3, completedRounds: 2 });
+    expect(p.sequence).toEqual(s.sequence);
+    expect(gameReducer(p, { type: 'press', color: 'green', nextColor: 'red' })).toBe(p);
+    const r = gameReducer(p, { type: 'resume' });
+    expect(r).toMatchObject({ status: 'presenting', round: 3, inputIndex: 0, completedRounds: 2 });
+    expect(r.sequence).toEqual(s.sequence);
+    expect(r.presentationId).toBe(p.presentationId + 1);
+    const l = gameReducer(r, { type: 'presentationDone', presentationId: r.presentationId });
+    expect(gameReducer(l, { type: 'press', color: 'green', nextColor: 'red' }).inputIndex).toBe(1);
+  });
+
+  it('pause במעבר בין שלבים משלים את המעבר; showNextRound מיושן מתעלם', () => {
+    let s = atRound(2, SEQ);
+    s = run(
+      [
+        { type: 'press', color: 'green', nextColor: 'green' },
+        { type: 'press', color: 'red', nextColor: 'green' },
+      ],
+      s,
+    );
+    expect(s).toMatchObject({ status: 'presenting', round: 2, completedRounds: 2 });
+    const p = gameReducer(s, { type: 'pause' });
+    expect(p).toMatchObject({ status: 'paused', round: 3, completedRounds: 2 });
+    expect(p.sequence).toHaveLength(3);
+    expect(gameReducer(p, { type: 'showNextRound', presentationId: s.presentationId })).toBe(p);
+    const r = gameReducer(p, { type: 'resume' });
+    expect(gameReducer(r, { type: 'showNextRound', presentationId: r.presentationId })).toBe(r);
+    expect(gameReducer(r, { type: 'presentationDone', presentationId: r.presentationId }).status).toBe(
+      'awaitingInput',
+    );
+  });
+
+  it('pause ו-resume לא משפיעים מחוץ למצבים המותרים', () => {
+    expect(gameReducer(initialGameState, { type: 'pause' })).toBe(initialGameState);
+    expect(gameReducer(initialGameState, { type: 'resume' })).toBe(initialGameState);
+    const lost = gameReducer(atRound(1, SEQ), { type: 'press', color: 'red', nextColor: 'red' });
+    expect(gameReducer(lost, { type: 'pause' })).toBe(lost);
+    const p = gameReducer(started(), { type: 'pause' });
+    expect(gameReducer(p, { type: 'pause' })).toBe(p);
+    const s = started();
+    expect(gameReducer(s, { type: 'resume' })).toBe(s);
   });
 
   it('קיימים ארבעה צבעים שונים', () => {

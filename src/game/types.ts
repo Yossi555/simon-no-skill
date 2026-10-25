@@ -1,6 +1,6 @@
 import type { GameColor } from './colors';
 
-export type GameStatus = 'idle' | 'presenting' | 'awaitingInput' | 'won' | 'lost';
+export type GameStatus = 'idle' | 'presenting' | 'awaitingInput' | 'paused' | 'won' | 'lost';
 
 export type GameState = {
   status: GameStatus;
@@ -21,5 +21,7 @@ export type GameAction =
   | { type: 'showNextRound'; presentationId: number }
   | { type: 'revealResult'; gameId: number }
   | { type: 'dismiss' }
-  /** פתרון זמני של Milestone 2 – מוחלף ב-pause ב-Milestone 3 */
-  | { type: 'abandon' };
+  /** השהיה (אודות / הסתרה): הקלט החלקי נזרק, הצגה מיושנת מתבטלת */
+  | { type: 'pause' }
+  /** "המשך משחק": הצגה מחדש של כל הרצף של אותו שלב */
+  | { type: 'resume' };

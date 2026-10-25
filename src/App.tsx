@@ -11,8 +11,7 @@ export function App({ gameDeps }: Props = {}) {
   const game = useGame(gameDeps);
 
   const navigate = (next: Screen) => {
-    // פתרון זמני (M2): מעבר ל"אודות" באמצע משחק מבטל אותו; יוחלף בהשהיה ב-M3
-    if (next === 'about') game.abandon();
+    if (next === 'about') game.pause();
     setScreen(next);
   };
 

@@ -109,6 +109,7 @@ h2 { font-size: 24px; font-weight: 700; }
 .quadrant:not(:disabled):active { filter: brightness(1.15); }
 .quadrant:disabled { cursor: default; }
 .quadrant--dim { opacity: 0.3; }
+.board--paused .quadrant { opacity: 0.35; }
 .quadrant--lit { filter: brightness(1.3); box-shadow: inset 0 0 28px 6px rgba(255, 255, 255, 0.55); }
 .quadrant--green { color: var(--green); }
 .quadrant--red { color: var(--red); }

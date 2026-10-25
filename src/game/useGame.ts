@@ -134,16 +134,43 @@ export function useGame(deps?: Partial<GameDeps>) {
     dispatch({ type: 'dismiss' });
   }, [confetti]);
 
-  /** פתרון זמני (M2): מעבר ל"אודות" באמצע משחק מבטל אותו */
-  const abandon = useCallback(() => {
-    const s = stateRef.current;
-    if (s.status === 'idle' || s.resultShown) return;
+  /** השהיה: ניווט ל"אודות", הסתרת האפליקציה או pagehide (ADR-3) */
+  const pause = useCallback(() => {
+    const { status } = stateRef.current;
+    if (status !== 'presenting' && status !== 'awaitingInput') return;
     endHold();
     engine.stopAll();
     setLit(null);
-    confetti.reset();
-    dispatch({ type: 'abandon' });
-  }, [endHold, engine, confetti]);
+    dispatch({ type: 'pause' });
+  }, [endHold, engine]);
 
-  return { state, litColor, audioError, start, press, pressAndRelease, release, dismiss, abandon };
+  /** "המשך משחק" – Gesture אודיו, ואז הצגה מחדש של כל הרצף */
+  const resume = useCallback(async () => {
+    if (stateRef.current.status !== 'paused' || starting.current) return;
+    starting.current = true;
+    setAudioError(false);
+    const ok = await engine.unlock();
+    starting.current = false;
+    if (!ok) {
+      setAudioError(true);
+      return;
+    }
+    if (stateRef.current.status !== 'paused') return;
+    dispatch({ type: 'resume' });
+  }, [engine]);
+
+  // Visibility Handler: הסתרה משהה; חזרה ל-visible לא מחדשת
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') pause();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', pause);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', pause);
+    };
+  }, [pause]);
+
+  return { state, litColor, audioError, start, press, pressAndRelease, release, dismiss, pause, resume };
 }

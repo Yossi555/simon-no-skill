@@ -5,7 +5,7 @@ import type { useGame } from '../game/useGame';
 type Props = { game: ReturnType<typeof useGame> };
 
 export function HomeScreen({ game }: Props) {
-  const { state, litColor, audioError, start, press, pressAndRelease, dismiss } = game;
+  const { state, litColor, audioError, start, resume, press, pressAndRelease, dismiss } = game;
   const { status } = state;
 
   return (
@@ -18,6 +18,7 @@ export function HomeScreen({ game }: Props) {
         <Board
           litColor={litColor}
           disabled={status !== 'awaitingInput'}
+          paused={status === 'paused'}
           onPress={press}
           onKeyPress={pressAndRelease}
         />
@@ -37,17 +38,21 @@ export function HomeScreen({ game }: Props) {
             <p className="home__hint">הקש על הצבעים לפי הסדר</p>
           </>
         )}
+        {status === 'paused' && <p className="home__status">המשחק מושהה</p>}
+        {(status === 'idle' || status === 'paused') && audioError && (
+          <p className="home__error" role="alert">
+            לא ניתן להפעיל את הצליל. נסו שוב.
+          </p>
+        )}
         {status === 'idle' && (
-          <>
-            {audioError && (
-              <p className="home__error" role="alert">
-                לא ניתן להפעיל את הצליל. נסו שוב.
-              </p>
-            )}
-            <button type="button" className="btn btn--primary" onClick={() => void start()}>
-              התחל משחק
-            </button>
-          </>
+          <button type="button" className="btn btn--primary" onClick={() => void start()}>
+            התחל משחק
+          </button>
+        )}
+        {status === 'paused' && (
+          <button type="button" className="btn btn--primary" onClick={() => void resume()}>
+            המשך משחק
+          </button>
         )}
       </div>
     </section>
