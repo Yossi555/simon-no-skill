@@ -1,5 +1,3 @@
-# Setup stage: publishes the placeholder page.
-# Milestone 1 replaces this with: npm ci → typecheck → test → build → deploy dist/.
 name: Deploy to GitHub Pages
 
 on:
@@ -24,9 +22,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: placeholder
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
