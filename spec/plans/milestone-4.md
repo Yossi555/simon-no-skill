@@ -81,3 +81,5 @@ src/test/setup.ts               – localStorage.clear() אחרי כל בדיק�
 | 6 | בדיקות אוטומטיות: היסטוריה, מגבלת עשר, מחיקה, כשל אחסון, מניעת שמירה כפולה | **עובר** – כולל Strict Mode: שני משחקים → בדיוק 2 רשומות ו-2 קריאות `setItem` |
 
 **מגבלות:** לא נבדק במכשיר פיזי. בדפדפן (Viewport נייד 375×812) נבדקו: רשימת כרטיסים, Dialog המחיקה, מחיקה בפועל, ורישום הפסד אמיתי ב-Strict Mode. מצב אחסון חסום אמיתי (למשל גלישה פרטית) נבדק רק בבדיקות אוטומטיות.
+
+**Workflow:** הסתיים בהצלחה עבור קומיט `487951b` (https://github.com/Yossi555/simon-no-skill/actions/runs/40189150910); האתר החי מגיש את ה-Build החדש (`index-CNbY9Abl.js`, כולל `simon.history.v1`): https://yossi555.github.io/simon-no-skill/
